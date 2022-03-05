@@ -61,7 +61,6 @@ public class BirthdayParty {
             guest.markVisited();
         }  
     }
-
 }
 
 
@@ -99,5 +98,4 @@ class GuestThread implements Runnable {
     public void markVisited() {
         this.visited = true;
     }
- 
 }

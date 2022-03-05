@@ -120,9 +120,11 @@ class CLHLock implements Lock{
 	}
 }
 
+
 class Guest {
     volatile boolean isWaiting = false;
 }
+
 
 class GuestThread implements Runnable {
     private boolean visited = false;
