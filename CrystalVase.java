@@ -8,18 +8,16 @@ import java.util.Scanner;
 
 public class CrystalVase {
     static int numGuests;
-    // static AtomicBoolean isShowOver = new AtomicBoolean(false);
     static AtomicInteger visitorsCount = new AtomicInteger(0);
 
     public static void main(String [] args) {
-
         Scanner input = new Scanner(System.in);
 
         do {
             System.out.println("How many guests are at the event?");
             numGuests = input.nextInt();
             if (numGuests < 2) 
-                System.out.println("Not enough guests for the party.");
+                System.out.println("Not enough guests for the event.");
         } while (numGuests < 2);
 
         input.close();
@@ -35,24 +33,20 @@ public class CrystalVase {
             new Thread(guests[i]).start();
         }
             
-
         // Wait till every guest visits labyrinth. 
         while (visitorsCount.get() < numGuests) {}
         
-        // Stop all threads.
-        //isShowOver.set(true);
-
-        for (int i = 0; i < numGuests; i++) {
+        // Telling guests to leave.
+        for (int i = 0; i < numGuests; i++) 
             guests[i].leave();
-        }
 
         System.out.println("The show is over. All " + visitorsCount.get() + 
                            " guests got a chance to see the Crystal Vase.");
     }
 
-    public static void enterTheShowroom(GuestThread guest) {
-       
-        // If first time visiting leave a trace.
+    // Showroom with incredible Crystal Vase inside.
+    public static void enterTheShowroom(GuestThread guest) {   
+        // If first time visiting.
         if (!guest.isVisited()) {
             visitorsCount.addAndGet(1);
             guest.markVisited();
@@ -76,6 +70,7 @@ class CLHLock implements Lock{
                 return new Guest();
             }
         };
+
         myPred = new ThreadLocal<Guest>() {
             protected Guest initialValue() {
                 return null;
@@ -83,7 +78,6 @@ class CLHLock implements Lock{
         };
     }
 
-    // Get in line.
     @Override
     public void lock() {
         Guest guest = myself.get();
@@ -94,7 +88,6 @@ class CLHLock implements Lock{
         while (pred.isWaiting) {}  
     }
 
-    // Tell next person in line that room is available.
     @Override
     public void unlock() {
         Guest guest = myself.get();
@@ -102,10 +95,11 @@ class CLHLock implements Lock{
         myself.set(myPred.get());
     }
     
+    // Necessary extra stuff for the Interface Lock.
+
     @Override
 	public void lockInterruptibly() throws InterruptedException {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -128,13 +122,13 @@ class CLHLock implements Lock{
 }
 
 class Guest {
-    boolean isWaiting = false;
+    volatile boolean isWaiting = false;
 }
 
 class GuestThread implements Runnable {
     private boolean visited = false;
     private CLHLock lock;
-    private volatile boolean stop = false;
+    private boolean stop = false;
     
     GuestThread(CLHLock lock) {
         this.lock = lock;
@@ -142,19 +136,16 @@ class GuestThread implements Runnable {
 
     public void run() {
        
-        while (!this.stop) {
+        while (!stop) {
+            // Get in line to see the vase.
             this.lock.lock();
-
             try {
                 CrystalVase.enterTheShowroom(this);
             } finally {
+                // Inform next guest in line.
                 this.lock.unlock();
             }
-            
-            //System.out.println("here");
         }
-
-        System.out.println("Stopping " + Thread.currentThread().getId());
     }
 
     public Boolean isVisited() {
