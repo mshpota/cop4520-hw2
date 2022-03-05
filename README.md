@@ -38,8 +38,6 @@ java BirthdayParty
 
 After that, the program will ask for the input of number of guests in the party. Type a positive integer value and press enter. Program will continue with the problem.
 
-
-
 ## PROBLEM 2:
 
 #### IMPLEMENTATION
@@ -64,7 +62,7 @@ Strategy 1:
 
 Strategy 2: 
 
-*Pros:* fast; minimized contention (guests only periodically check the sign                       and go about their business).
+*Pros:* fast; minimized contention (guests only periodically check the sign and go about their business).
 
 *Cons:* no fairness guarantee, starvation prone (some guests will still be unlucky and wait for very long before get a chance to enter the room).
 
